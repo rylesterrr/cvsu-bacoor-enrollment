@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Access denied · CvSU Bacoor</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="error-body">
+  <main class="error-shell">
+    <span class="error-code">403</span>
+    <h1>Access denied</h1>
+    <p>This page belongs to a different part of the portal. Sign in with the right account or return to your dashboard.</p>
+    <a class="btn btn-primary" href="{% url 'enrollment:dashboard' %}">Back to dashboard</a>
+  </main>
+</body>
+</html>

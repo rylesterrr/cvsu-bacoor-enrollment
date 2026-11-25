@@ -1,0 +1,43 @@
+{% extends "accounts/_auth_base.html" %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+  <div class="auth-header">
+    <span class="eyebrow">Welcome back</span>
+    <h1>Sign in to the enrollment portal</h1>
+    <p>Use your CvSU email address and password to continue.</p>
+  </div>
+
+  <form method="post" class="auth-form" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="form-alert">
+        <svg class="icon"><use href="#i-alert"></use></svg>
+        <div>
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% include "partials/_field.html" with field=form.username %}
+    {% include "partials/_field.html" with field=form.password %}
+
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn btn-primary btn-block">
+      Sign in
+      <svg class="icon"><use href="#i-arrow-right"></use></svg>
+    </button>
+  </form>
+
+  <p class="auth-switch">New student? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+
+  {% if debug %}
+    <div class="auth-note">
+      <strong>Demo accounts</strong>
+      <span>Student: <code>student@example.com</code> / <code>Student12345!</code></span>
+      <span>Admin: <code>admin@example.com</code> / <code>Admin12345!</code></span>
+      <small>Run <code>python manage.py seed_demo</code> to create them.</small>
+    </div>
+  {% endif %}
+{% endblock %}

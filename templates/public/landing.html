@@ -1,0 +1,440 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cavite State University · Bacoor City Campus</title>
+  <meta name="description" content="Official online enrollment portal of Cavite State University – Bacoor City Campus. Apply for admission, track your application, and enroll in your courses online.">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+{% include "partials/_sprite.html" %}
+
+<a class="sr-only" href="#main">Skip to content</a>
+
+<div class="site-topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-links">
+      <a class="topbar-contact" href="#contact">
+        <svg class="icon icon-xs"><use href="#i-phone"></use></svg>
+        <span>Contact Us</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-news" href="#news">
+        <svg class="icon icon-xs"><use href="#i-news"></use></svg>
+        <span>News and Updates</span>
+      </a>
+    </div>
+    <div class="topbar-links">
+      <a href="{% url 'accounts:login' %}">Student Portal</a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-elearning" href="#programs">eLearning</a>
+      <span class="topbar-social">
+        <a href="https://www.facebook.com/CaviteStateU" target="_blank" rel="noopener" aria-label="CvSU on Facebook">
+          <svg class="icon"><use href="#i-facebook"></use></svg>
+        </a>
+        <a href="https://www.youtube.com/channel/UC6p5srphejusQzaulrxmtow" target="_blank" rel="noopener" aria-label="CvSU on YouTube">
+          <svg class="icon"><use href="#i-youtube"></use></svg>
+        </a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="container header-inner">
+    <a class="site-brand" href="{% url 'enrollment:home' %}">
+      <img class="site-logo" src="{% static 'img/cvsu-seal.svg' %}" alt="Cavite State University seal">
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span class="site-brand-text">
+        <strong>CAVITE STATE UNIVERSITY</strong>
+        <span>BACOOR CITY CAMPUS</span>
+      </span>
+    </a>
+
+    <a class="campuses-link" href="#about">
+      <svg class="icon"><use href="#i-grid-dots"></use></svg>
+      Campuses
+    </a>
+
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="siteNav">
+      <svg class="icon"><use href="#i-menu"></use></svg>
+    </button>
+
+    <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          About Us <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="#about">Campus overview</a>
+          <a href="#news">News and updates</a>
+          <a href="#contact">Contact us</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Admission <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="{% url 'accounts:register' %}">Apply for admission</a>
+          <a href="{% url 'accounts:login' %}">Application status</a>
+          <a href="#admission">Admission procedures</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Academics <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="#programs">Academic programs</a>
+          <a href="{% url 'accounts:login' %}">Subject offerings</a>
+          <a href="{% url 'accounts:login' %}">Online enrollment</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Research &amp; Extension <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="#research">Research and extension</a>
+          <a href="#about">Community engagement</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Students <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="{% url 'accounts:login' %}">Student portal</a>
+          <a href="{% url 'accounts:login' %}">Enrollment status</a>
+          <a href="#students">How to enroll</a>
+        </div>
+      </div>
+
+      <div class="nav-item has-drop">
+        <button class="nav-link" type="button" aria-expanded="false">
+          Services <svg class="icon"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="nav-dropdown">
+          <a href="#services">Registrar services</a>
+          <a href="#contact">Help and support</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="hero-eyebrow">Welcome to</span>
+        <h1>
+          Cavite State University<br>
+          <span class="hero-underline">Bacoor City Campus
+            <svg viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M2 10C72 3 188 2 298 8" fill="none" stroke="#f2c94c" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </h1>
+        <p class="hero-sub">Your future starts here. Apply for admission, track your application, and enroll in your courses — all in one online portal.</p>
+        <div class="hero-actions">
+          <a class="btn btn-green" href="{% url 'accounts:register' %}">
+            Apply for admission
+            <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg>
+          </a>
+          <a class="btn btn-outline" href="{% url 'accounts:login' %}">Student portal</a>
+        </div>
+        <p class="hero-term">
+          <span class="hero-term-dot" aria-hidden="true"></span>
+          {% if term %}Enrollment is open for {{ term }}{% else %}Enrollment opens soon{% endif %}
+        </p>
+      </div>
+
+      <div class="hero-visual">
+        <span class="hero-ring" aria-hidden="true"></span>
+        <span class="hero-dots" aria-hidden="true"></span>
+        <svg class="hero-waves" viewBox="0 0 160 180" fill="none" aria-hidden="true">
+          <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <path d="M2 18c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+            <path d="M2 48c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+            <path d="M2 78c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+            <path d="M2 108c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+            <path d="M2 138c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+            <path d="M2 168c18-11 36 11 54 0s36-11 54 0 36 11 48 0"/>
+          </g>
+        </svg>
+        <img class="hero-art" src="{% static 'img/campus-hero.svg' %}" alt="Illustration of the CvSU Bacoor City Campus academic building">
+        <div class="hero-badge">
+          <span class="hero-badge-icon"><svg class="icon"><use href="#i-check-circle"></use></svg></span>
+          <span>
+            <strong>Online enrollment</strong>
+            <span>Apply, track, and enroll in one place</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quick-section" id="admission">
+    <div class="container quick-grid">
+      <a class="quick-card" href="{% url 'accounts:register' %}">
+        <h2>Admission Procedures</h2>
+        <p>Check the requirements and steps for admission, then submit your application online.</p>
+        <span class="quick-link">Start your application <svg class="icon"><use href="#i-arrow-right"></use></svg></span>
+        <span class="quick-art" aria-hidden="true"><svg class="icon"><use href="#i-file"></use></svg></span>
+      </a>
+
+      <a class="quick-card" href="#programs">
+        <h2>Academic Programs</h2>
+        <p>Explore the degree programs offered at the Bacoor City Campus.</p>
+        <span class="quick-link">View programs <svg class="icon"><use href="#i-arrow-right"></use></svg></span>
+        <span class="quick-art" aria-hidden="true"><svg class="icon"><use href="#i-cap"></use></svg></span>
+      </a>
+
+      <a class="quick-card" href="{% url 'accounts:login' %}">
+        <h2>Online Enrollment</h2>
+        <p>Sign in to the student portal to enroll in sections and view your status.</p>
+        <span class="quick-link">Open student portal <svg class="icon"><use href="#i-arrow-right"></use></svg></span>
+        <span class="quick-art" aria-hidden="true"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="news">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">News and Updates</span>
+        <h2>What's happening at Bacoor</h2>
+        <p>Announcements from the campus registrar and student services office.</p>
+      </div>
+
+      <div class="news-grid">
+        <article class="news-card">
+          <div class="news-media is-green" aria-hidden="true">
+            <svg class="icon"><use href="#i-calendar"></use></svg>
+          </div>
+          <div class="news-body">
+            <span class="news-meta">Enrollment</span>
+            <h3>Enrollment for A.Y. 2026–2027 is now open</h3>
+            <p>Incoming and current students can submit applications and enroll in sections through the online portal.</p>
+            <a class="news-link" href="{% url 'accounts:register' %}">Apply now <svg class="icon"><use href="#i-arrow-right"></use></svg></a>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <div class="news-media is-gold" aria-hidden="true">
+            <svg class="icon"><use href="#i-clipboard"></use></svg>
+          </div>
+          <div class="news-body">
+            <span class="news-meta">Registrar</span>
+            <h3>Track your application in real time</h3>
+            <p>Use the student portal to check your application status and read the latest remarks from the registrar.</p>
+            <a class="news-link" href="{% url 'accounts:login' %}">Check status <svg class="icon"><use href="#i-arrow-right"></use></svg></a>
+          </div>
+        </article>
+
+        <article class="news-card">
+          <div class="news-media is-blue" aria-hidden="true">
+            <svg class="icon"><use href="#i-users"></use></svg>
+          </div>
+          <div class="news-body">
+            <span class="news-meta">Student Services</span>
+            <h3>Need help with your enrollment?</h3>
+            <p>Contact the campus registrar for corrections to your records, section concerns, or account assistance.</p>
+            <a class="news-link" href="#contact">Contact us <svg class="icon"><use href="#i-arrow-right"></use></svg></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-band" id="about">
+    <span id="research" aria-hidden="true"></span>
+    <div class="container about-grid">
+      <div>
+        <span class="eyebrow">About the campus</span>
+        <h2>Quality education, closer to home.</h2>
+        <p>Established in 2008, Cavite State University – Bacoor City Campus provides quality and affordable education to the people of Bacoor and nearby communities. The campus offers undergraduate programs in information technology, computer science, business, psychology, criminology, hospitality management, and teacher education.</p>
+        <a class="btn btn-gold" href="#programs">Explore academic programs</a>
+      </div>
+
+      <div class="about-stats">
+        <div class="about-stat">
+          <strong>2008</strong>
+          <span>Campus established</span>
+        </div>
+        <div class="about-stat">
+          <strong>{{ programs|length }}</strong>
+          <span>Degree programs</span>
+        </div>
+        <div class="about-stat">
+          <strong>4</strong>
+          <span>Core values</span>
+        </div>
+        <div class="about-stat">
+          <strong>3</strong>
+          <span>Steps to enroll</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="programs">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow">Academics</span>
+        <h2>Academic programs</h2>
+        <p>Choose from undergraduate programs designed to prepare you for a changing world.</p>
+      </div>
+
+      <div class="program-grid">
+        {% for program in programs %}
+          <article class="program-card">
+            <span class="program-code">{{ program.code }}</span>
+            <h3>{{ program.name }}</h3>
+            <p>{{ program.description|default:"A four-year undergraduate program offered at the Bacoor City Campus." }}</p>
+            <a class="quick-link" href="{% url 'accounts:register' %}">Apply for this program <svg class="icon"><use href="#i-arrow-right"></use></svg></a>
+          </article>
+        {% empty %}
+          <article class="program-card">
+            <span class="program-code">CvSU</span>
+            <h3>Programs will be posted soon</h3>
+            <p>The campus is preparing its program offerings for the next academic year. Please check back shortly.</p>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-soft" id="students">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow">Student portal</span>
+        <h2>Enroll in three simple steps</h2>
+        <p>Everything you need for the semester, from application to enrollment confirmation.</p>
+      </div>
+
+      <div class="steps-grid">
+        <article class="step-card">
+          <span class="step-num">01</span>
+          <div>
+            <h3>Apply online</h3>
+            <p>Create your student account and submit your admission application for the active term.</p>
+          </div>
+        </article>
+        <article class="step-card">
+          <span class="step-num">02</span>
+          <div>
+            <h3>Get approved</h3>
+            <p>The registrar reviews your application and posts a decision in the portal.</p>
+          </div>
+        </article>
+        <article class="step-card">
+          <span class="step-num">03</span>
+          <div>
+            <h3>Choose your sections</h3>
+            <p>Once approved, select your sections, submit your enrollment, and wait for confirmation.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="services">
+    <div class="container">
+      <div class="cta-inner">
+        <div>
+          <h2>Ready for the new semester?</h2>
+          <p>Sign in to the student portal or create your account to get started.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn-green" href="{% url 'accounts:login' %}">Student portal</a>
+          <a class="btn btn-outline" href="{% url 'accounts:register' %}">Create account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img class="footer-seal" src="{% static 'img/cvsu-seal.svg' %}" alt="">
+          <div>
+            <strong>CAVITE STATE UNIVERSITY</strong>
+            <span>BACOOR CITY CAMPUS</span>
+          </div>
+        </div>
+        <p class="footer-about">A premier university in historic Cavite, committed to truth, excellence, and service through quality instruction, research, and community engagement.</p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/CaviteStateU" target="_blank" rel="noopener" aria-label="CvSU on Facebook">
+            <svg class="icon"><use href="#i-facebook"></use></svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UC6p5srphejusQzaulrxmtow" target="_blank" rel="noopener" aria-label="CvSU on YouTube">
+            <svg class="icon"><use href="#i-youtube"></use></svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h3>Quick Links</h3>
+        <div class="footer-links">
+          <a href="{% url 'accounts:login' %}">Student Portal</a>
+          <a href="{% url 'accounts:register' %}">Apply for Admission</a>
+          <a href="{% url 'accounts:login' %}">Application Status</a>
+          <a href="{% url 'accounts:login' %}">Enrollment Status</a>
+          <a href="#news">News and Updates</a>
+        </div>
+      </div>
+
+      <div>
+        <h3>Programs</h3>
+        <div class="footer-links">
+          {% for program in programs|slice:":5" %}
+            <a href="#programs">{{ program.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <h3>Contact Us</h3>
+        <ul class="footer-contact">
+          <li>
+            <svg class="icon"><use href="#i-map-pin"></use></svg>
+            <span>Lily Street, Phase II, Soldiers Hills IV, Molino VI, Bacoor City, Cavite 4102</span>
+          </li>
+          <li>
+            <svg class="icon"><use href="#i-phone"></use></svg>
+            <a href="tel:+63464765029">(046) 476-5029</a>
+          </li>
+          <li>
+            <svg class="icon"><use href="#i-mail"></use></svg>
+            <a href="mailto:cvsubacoor@cvsu.edu.ph">cvsubacoor@cvsu.edu.ph</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Cavite State University – Bacoor City Campus. All rights reserved.</span>
+      <span>Truth · Excellence · Service</span>
+    </div>
+  </div>
+</footer>
+
+<script src="{% static 'js/landing.js' %}" defer></script>
+</body>
+</html>

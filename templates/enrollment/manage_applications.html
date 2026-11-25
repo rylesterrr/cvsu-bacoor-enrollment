@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Applications{% endblock %}
+{% block page_title %}Applications{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Review admission applications and post decisions.</p>
+{% endblock %}
+
+{% block content %}
+  <nav class="filter-tabs" aria-label="Filter applications by status">
+    {% for tab in tabs %}
+      {% if tab.value %}
+        <a class="filter-tab {% if tab.value == active_status %}active{% endif %}" href="?status={{ tab.value }}">
+          {{ tab.label }} <span class="filter-count">{{ tab.count }}</span>
+        </a>
+      {% else %}
+        <a class="filter-tab {% if not active_status %}active{% endif %}" href="{% url 'enrollment:manage_applications' %}">
+          {{ tab.label }} <span class="filter-count">{{ tab.count }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>{% if active_status %}Filtered applications{% else %}All applications{% endif %}</h2>
+        <p class="card-sub">{{ applications|length }} application{{ applications|length|pluralize }} shown.</p>
+      </div>
+    </div>
+
+    {% if applications %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Program</th>
+              <th>Term</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for application in applications %}
+              <tr>
+                <td>
+                  <span class="cell-title">{{ application.student.user.full_name }}</span>
+                  <span class="cell-sub">{{ application.student.student_number }} · {{ application.student.user.email }}</span>
+                </td>
+                <td>
+                  <span class="cell-strong">{{ application.program.code }}</span>
+                  <span class="cell-sub">{{ application.get_year_level_display }}</span>
+                </td>
+                <td>{{ application.term }}</td>
+                <td>{{ application.submitted_at|date:"M d, Y" }}</td>
+                <td><span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span></td>
+                <td class="num">
+                  <a class="btn btn-secondary btn-sm" href="{% url 'enrollment:review_application' application.pk %}">
+                    Review <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+        <h3>No applications here</h3>
+        <p>There are no applications matching this filter.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

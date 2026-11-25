@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{% if application %}Edit application{% else %}Apply{% endif %}{% endblock %}
+{% block page_title %}{% if application %}Update your application{% else %}Apply for admission{% endif %}{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">{{ term }} · Submit once, then track your status anytime.</p>
+{% endblock %}
+
+{% block content %}
+  <div class="split">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Application form</h2>
+          <p class="card-sub">Fields marked with <span class="req">*</span> are required.</p>
+        </div>
+        {% if application %}
+          <span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span>
+        {% endif %}
+      </div>
+
+      {% if application and application.status == 'REJECTED' and application.remarks %}
+        <div class="notice notice-rejected">
+          <svg class="icon"><use href="#i-alert"></use></svg>
+          <p><strong>Registrar remarks:</strong> {{ application.remarks }}</p>
+        </div>
+      {% endif %}
+
+      <form method="post" class="form-layout" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="form-alert">
+            <svg class="icon"><use href="#i-alert"></use></svg>
+            <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+          </div>
+        {% endif %}
+
+        <div class="form-grid">
+          {% include "partials/_field.html" with field=form.program %}
+          {% include "partials/_field.html" with field=form.year_level %}
+          {% include "partials/_field.html" with field=form.application_type %}
+          {% include "partials/_field.html" with field=form.general_average %}
+        </div>
+
+        {% include "partials/_field.html" with field=form.previous_school %}
+        {% include "partials/_field.html" with field=form.personal_statement %}
+
+        <div class="form-actions">
+          <a class="btn btn-ghost" href="{% url 'enrollment:application_status' %}">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            {% if application %}Resubmit application{% else %}Submit application{% endif %}
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="stack">
+      <section class="card card-muted">
+        <div class="card-head">
+          <div>
+            <h2>Before you submit</h2>
+          </div>
+        </div>
+        <ul class="check-list">
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Use your legal name and a working email.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Pick the program you want to enroll in.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Your student number is generated automatically.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> You can edit and resubmit if you are waitlisted or rejected.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Term</h2>
+          </div>
+        </div>
+        <dl class="meta-list">
+          <div><dt>School year</dt><dd>{{ term.school_year }}</dd></div>
+          <div><dt>Semester</dt><dd>{{ term.get_semester_display }}</dd></div>
+          <div><dt>Deadline</dt><dd>{{ term.enrollment_deadline|date:"M d, Y"|default:"Not set" }}</dd></div>
+        </dl>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

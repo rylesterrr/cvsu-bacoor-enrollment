@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Enrollments{% endblock %}
+{% block page_title %}Enrollments{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Confirm student enrollments and keep statuses up to date.</p>
+{% endblock %}
+
+{% block content %}
+  <nav class="filter-tabs" aria-label="Filter enrollments by status">
+    {% for tab in tabs %}
+      {% if tab.value %}
+        <a class="filter-tab {% if tab.value == active_status %}active{% endif %}" href="?status={{ tab.value }}">
+          {{ tab.label }} <span class="filter-count">{{ tab.count }}</span>
+        </a>
+      {% else %}
+        <a class="filter-tab {% if not active_status %}active{% endif %}" href="{% url 'enrollment:manage_enrollments' %}">
+          {{ tab.label }} <span class="filter-count">{{ tab.count }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </nav>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>{% if active_status %}Filtered enrollments{% else %}All enrollments{% endif %}</h2>
+        <p class="card-sub">{{ enrollments|length }} record{{ enrollments|length|pluralize }} shown. Pending records are waiting for confirmation.</p>
+      </div>
+    </div>
+
+    {% if enrollments %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Student</th>
+              <th>Term</th>
+              <th class="num">Units</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enrollment in enrollments %}
+              <tr>
+                <td>
+                  <span class="cell-strong">{{ enrollment.reference_code }}</span>
+                  <span class="cell-sub">{{ enrollment.submitted_at|date:"M d, Y" }}</span>
+                </td>
+                <td>
+                  <span class="cell-title">{{ enrollment.student.user.full_name }}</span>
+                  <span class="cell-sub">{{ enrollment.student.student_number }}</span>
+                </td>
+                <td>
+                  <span class="cell-strong">{{ enrollment.term.school_year }}</span>
+                  <span class="cell-sub">{{ enrollment.term.get_semester_display }}</span>
+                </td>
+                <td class="num">{{ enrollment.units_total|default:0 }}</td>
+                <td><span class="badge badge-{{ enrollment.status_slug }}">{{ enrollment.get_status_display }}</span></td>
+                <td>
+                  <form method="post" action="{% url 'enrollment:update_enrollment_status' enrollment.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <select name="status" class="input input-sm" aria-label="Status for {{ enrollment.reference_code }}">
+                      <option value="PENDING" {% if enrollment.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                      <option value="ENROLLED" {% if enrollment.status == 'ENROLLED' %}selected{% endif %}>Enrolled</option>
+                      <option value="DROPPED" {% if enrollment.status == 'DROPPED' %}selected{% endif %}>Dropped</option>
+                      <option value="COMPLETED" {% if enrollment.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm">Save</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-users"></use></svg></span>
+        <h3>No enrollments here</h3>
+        <p>There are no enrollment records matching this filter.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

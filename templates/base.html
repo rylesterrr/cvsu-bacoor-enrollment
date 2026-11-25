@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} · CvSU Bacoor</title>
+  <meta name="description" content="CvSU Bacoor Online Enrollment System">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% include "partials/_sprite.html" %}
+
+<div class="app-shell" id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{% url 'enrollment:home' %}">
+      <span class="brand-mark"><img src="{% static 'img/cvsu-seal.svg' %}" alt=""></span>
+      <span class="brand-text">
+        <strong>CvSU Bacoor</strong>
+        <small>Online enrollment</small>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Main navigation">
+      {% if user.is_administrator %}
+        <span class="nav-label">Registrar</span>
+        <a class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'enrollment:dashboard' %}">
+          <svg class="icon"><use href="#i-grid"></use></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'manage_applications' or request.resolver_match.url_name == 'review_application' %}active{% endif %}" href="{% url 'enrollment:manage_applications' %}">
+          <svg class="icon"><use href="#i-clipboard"></use></svg>
+          <span>Applications</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'manage_enrollments' %}active{% endif %}" href="{% url 'enrollment:manage_enrollments' %}">
+          <svg class="icon"><use href="#i-users"></use></svg>
+          <span>Enrollments</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'subjects' %}active{% endif %}" href="{% url 'enrollment:subjects' %}">
+          <svg class="icon"><use href="#i-book"></use></svg>
+          <span>Subject offerings</span>
+        </a>
+        {% if user.is_staff %}
+          <span class="nav-label nav-label-spaced">System</span>
+          <a class="nav-item" href="{% url 'admin:index' %}">
+            <svg class="icon"><use href="#i-shield"></use></svg>
+            <span>Django admin</span>
+          </a>
+        {% endif %}
+      {% else %}
+        <span class="nav-label">Student portal</span>
+        <a class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'enrollment:dashboard' %}">
+          <svg class="icon"><use href="#i-grid"></use></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'application_status' or request.resolver_match.url_name == 'application_detail' or request.resolver_match.url_name == 'apply' %}active{% endif %}" href="{% url 'enrollment:application_status' %}">
+          <svg class="icon"><use href="#i-file"></use></svg>
+          <span>My application</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'enroll' %}active{% endif %}" href="{% url 'enrollment:enroll' %}">
+          <svg class="icon"><use href="#i-plus"></use></svg>
+          <span>Enroll</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'enrollment_status' %}active{% endif %}" href="{% url 'enrollment:enrollment_status' %}">
+          <svg class="icon"><use href="#i-clipboard"></use></svg>
+          <span>Enrollment status</span>
+        </a>
+        <a class="nav-item {% if request.resolver_match.url_name == 'subjects' %}active{% endif %}" href="{% url 'enrollment:subjects' %}">
+          <svg class="icon"><use href="#i-book"></use></svg>
+          <span>Subject offerings</span>
+        </a>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="user-chip" href="{% url 'accounts:profile' %}">
+        <span class="avatar">{{ user.initials }}</span>
+        <span class="user-meta">
+          <span class="user-name">{{ user.full_name }}</span>
+          <span class="user-role">{{ user.get_role_display }}</span>
+        </span>
+        <svg class="icon icon-sm"><use href="#i-chevron-right"></use></svg>
+      </a>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">
+          <svg class="icon"><use href="#i-logout"></use></svg>
+          <span>Log out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuToggle" type="button" aria-label="Open navigation" aria-expanded="false">
+        <svg class="icon"><use href="#i-menu"></use></svg>
+      </button>
+      <div class="page-heading">
+        <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        {% block page_subtitle %}{% endblock %}
+      </div>
+      <div class="topbar-actions">
+        {% block topbar_actions %}{% endblock %}
+      </div>
+    </header>
+
+    <main class="content">
+      {% if messages %}
+        <div class="flash-stack">
+          {% for message in messages %}
+            <div class="flash {{ message.tags }}">
+              {% if message.tags == 'success' %}
+                <svg class="icon"><use href="#i-check-circle"></use></svg>
+              {% elif message.tags == 'error' %}
+                <svg class="icon"><use href="#i-alert"></use></svg>
+              {% elif message.tags == 'warning' %}
+                <svg class="icon"><use href="#i-alert"></use></svg>
+              {% else %}
+                <svg class="icon"><use href="#i-info"></use></svg>
+              {% endif %}
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script src="{% static 'js/app.js' %}" defer></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

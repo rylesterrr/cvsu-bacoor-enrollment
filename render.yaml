@@ -1,0 +1,31 @@
+# Render Blueprint for the CvSU Bacoor Online Enrollment System.
+# Deploy from the Render dashboard: New + -> Blueprint -> select this repository.
+
+databases:
+  - name: cvsu-enrollment-db
+    databaseName: cvsu_enrollment
+    user: cvsu_enrollment
+    plan: free
+
+services:
+  - type: web
+    name: cvsu-bacoor-enrollment
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "python manage.py migrate --noinput && python manage.py seed_demo && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cvsu-enrollment-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: ALLOWED_HOSTS
+        value: "cvsu-bacoor-enrollment.onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://cvsu-bacoor-enrollment.onrender.com"

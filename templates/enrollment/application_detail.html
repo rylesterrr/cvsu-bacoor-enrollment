@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Application {{ application.pk }}{% endblock %}
+{% block page_title %}Application details{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">{{ application.term }} · {{ application.program }}</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  {% if application.can_edit and application.term.is_accepting_enrollment %}
+    <a class="btn btn-secondary" href="{% url 'enrollment:apply' %}">Edit application</a>
+  {% endif %}
+  {% if application.is_approved and not enrollment and application.term.is_accepting_enrollment %}
+    <a class="btn btn-primary" href="{% url 'enrollment:enroll' %}">Enroll now</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="split">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <span class="eyebrow">Application #{{ application.pk }}</span>
+          <h2>Admission application</h2>
+          <p class="card-sub">Submitted {{ application.submitted_at|date:"M d, Y g:i A" }}</p>
+        </div>
+        <span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span>
+      </div>
+
+      <dl class="detail-grid">
+        <div class="detail-item">
+          <dt class="detail-label">Program</dt>
+          <dd class="detail-value">{{ application.program }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt class="detail-label">Year level</dt>
+          <dd class="detail-value">{{ application.get_year_level_display }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt class="detail-label">Application type</dt>
+          <dd class="detail-value">{{ application.get_application_type_display }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt class="detail-label">General average</dt>
+          <dd class="detail-value">{{ application.general_average|default:"Not provided" }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt class="detail-label">Previous school</dt>
+          <dd class="detail-value">{{ application.previous_school|default:"Not provided" }}</dd>
+        </div>
+        <div class="detail-item">
+          <dt class="detail-label">Student number</dt>
+          <dd class="detail-value">{{ application.student.student_number }}</dd>
+        </div>
+      </dl>
+
+      <div class="statement">
+        <span class="detail-label">Personal statement</span>
+        <p>{{ application.personal_statement|linebreaksbr }}</p>
+      </div>
+    </section>
+
+    <aside class="stack">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Status</h2>
+            <p class="card-sub">{{ application.get_status_display }}</p>
+          </div>
+          <span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span>
+        </div>
+        <div class="notice notice-{{ application.status_slug }}">
+          <svg class="icon"><use href="#i-info"></use></svg>
+          <p>{{ application.status_note }}</p>
+        </div>
+
+        {% if application.remarks %}
+          <div class="remarks">
+            <span class="detail-label">Registrar remarks</span>
+            <p>{{ application.remarks }}</p>
+          </div>
+        {% endif %}
+
+        <dl class="meta-list">
+          <div><dt>Submitted</dt><dd>{{ application.submitted_at|date:"M d, Y g:i A" }}</dd></div>
+          <div><dt>Last updated</dt><dd>{{ application.updated_at|date:"M d, Y g:i A" }}</dd></div>
+          <div><dt>Reviewed by</dt><dd>{{ application.reviewed_by.full_name|default:"Not yet reviewed" }}</dd></div>
+        </dl>
+
+        {% if application.is_approved and not enrollment and application.term.is_accepting_enrollment %}
+          <a class="btn btn-primary btn-block" href="{% url 'enrollment:enroll' %}">Choose your sections</a>
+        {% elif enrollment %}
+          <a class="btn btn-secondary btn-block" href="{% url 'enrollment:enrollment_status' %}">View enrollment</a>
+        {% elif application.can_edit %}
+          <a class="btn btn-secondary btn-block" href="{% url 'enrollment:apply' %}">Edit and resubmit</a>
+        {% endif %}
+      </section>
+
+      <section class="card card-muted">
+        <div class="card-head">
+          <div>
+            <h2>What happens next?</h2>
+          </div>
+        </div>
+        <p class="muted-text">
+          The registrar reviews every application manually. Once approved, you can select sections
+          and submit your enrollment. Watch your dashboard for status changes.
+        </p>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

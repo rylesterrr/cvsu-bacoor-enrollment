@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Review application{% endblock %}
+{% block page_title %}Review application{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">{{ application.student.user.full_name }} · {{ application.term }}</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  <a class="btn btn-secondary" href="{% url 'enrollment:manage_applications' %}">
+    <svg class="icon"><use href="#i-arrow-right"></use></svg> Back to applications
+  </a>
+{% endblock %}
+
+{% block content %}
+  <div class="split">
+    <div class="stack">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <span class="eyebrow">Application #{{ application.pk }}</span>
+            <h2>{{ application.program }}</h2>
+            <p class="card-sub">Submitted {{ application.submitted_at|date:"M d, Y g:i A" }}</p>
+          </div>
+          <span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span>
+        </div>
+
+        <div class="applicant">
+          <span class="avatar avatar-lg">{{ application.student.user.initials }}</span>
+          <div>
+            <h3>{{ application.student.user.full_name }}</h3>
+            <p class="cell-sub">{{ application.student.user.email }}</p>
+          </div>
+          <span class="badge badge-neutral">{{ application.student.student_number }}</span>
+        </div>
+
+        <dl class="detail-grid">
+          <div class="detail-item">
+            <dt class="detail-label">Program</dt>
+            <dd class="detail-value">{{ application.program }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt class="detail-label">Year level</dt>
+            <dd class="detail-value">{{ application.get_year_level_display }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt class="detail-label">Application type</dt>
+            <dd class="detail-value">{{ application.get_application_type_display }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt class="detail-label">General average</dt>
+            <dd class="detail-value">{{ application.general_average|default:"Not provided" }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt class="detail-label">Previous school</dt>
+            <dd class="detail-value">{{ application.previous_school|default:"Not provided" }}</dd>
+          </div>
+          <div class="detail-item">
+            <dt class="detail-label">Term</dt>
+            <dd class="detail-value">{{ application.term }}</dd>
+          </div>
+        </dl>
+
+        <div class="statement">
+          <span class="detail-label">Personal statement</span>
+          <p>{{ application.personal_statement|linebreaksbr }}</p>
+        </div>
+      </section>
+
+      {% if application.remarks or application.reviewed_at %}
+        <section class="card card-muted">
+          <div class="card-head">
+            <div>
+              <h2>Previous review</h2>
+              <p class="card-sub">
+                {% if application.reviewed_by %}Reviewed by {{ application.reviewed_by.full_name }}{% endif %}
+                {% if application.reviewed_at %}on {{ application.reviewed_at|date:"M d, Y g:i A" }}{% endif %}
+              </p>
+            </div>
+          </div>
+          {% if application.remarks %}
+            <div class="remarks">
+              <span class="detail-label">Remarks</span>
+              <p>{{ application.remarks }}</p>
+            </div>
+          {% else %}
+            <p class="muted-text">No remarks were recorded.</p>
+          {% endif %}
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="stack sticky">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Decision</h2>
+            <p class="card-sub">The student sees this status and your remarks immediately.</p>
+          </div>
+        </div>
+
+        <form method="post" class="form-layout" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="form-alert">
+              <svg class="icon"><use href="#i-alert"></use></svg>
+              <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+            </div>
+          {% endif %}
+
+          {% include "partials/_field.html" with field=form.status %}
+          {% include "partials/_field.html" with field=form.remarks %}
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block">Save decision</button>
+          </div>
+        </form>
+
+        <div class="notice notice-approved">
+          <svg class="icon"><use href="#i-info"></use></svg>
+          <p>Approving an application lets the student choose sections and submit an enrollment.</p>
+        </div>
+      </section>
+
+      <section class="card card-muted">
+        <div class="card-head">
+          <div>
+            <h2>Review checklist</h2>
+          </div>
+        </div>
+        <ul class="check-list">
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Confirm the student's identity and email.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Check the previous school and average.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Read the personal statement.</li>
+          <li><svg class="icon icon-sm"><use href="#i-check"></use></svg> Record clear remarks for the student.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+{% endblock %}

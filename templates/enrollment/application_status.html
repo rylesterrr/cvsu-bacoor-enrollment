@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}My application{% endblock %}
+{% block page_title %}My application{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Track your admission application and the registrar's decision.</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  {% if term and term.is_accepting_enrollment %}
+    {% if current_application %}
+      {% if current_application.can_edit %}
+        <a class="btn btn-secondary" href="{% url 'enrollment:apply' %}">Edit application</a>
+      {% else %}
+        <a class="btn btn-secondary" href="{% url 'enrollment:application_detail' current_application.pk %}">View details</a>
+      {% endif %}
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'enrollment:apply' %}">
+        <svg class="icon"><use href="#i-plus"></use></svg> Start application
+      </a>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if applications %}
+    <div class="stack">
+      {% for application in applications %}
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <span class="eyebrow">{{ application.term }}</span>
+              <h2>{{ application.program }}</h2>
+              <p class="card-sub">
+                {{ application.get_application_type_display }} ·
+                {{ application.get_year_level_display }} ·
+                Submitted {{ application.submitted_at|date:"M d, Y" }}
+              </p>
+            </div>
+            <span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span>
+          </div>
+
+          <div class="notice notice-{{ application.status_slug }}">
+            <svg class="icon"><use href="#i-info"></use></svg>
+            <p>{{ application.status_note }}</p>
+          </div>
+
+          {% if application.remarks %}
+            <div class="remarks">
+              <span class="detail-label">Registrar remarks</span>
+              <p>{{ application.remarks }}</p>
+            </div>
+          {% endif %}
+
+          <div class="card-foot">
+            <span class="cell-sub">
+              {% if application.reviewed_at %}
+                Last reviewed {{ application.reviewed_at|date:"M d, Y g:i A" }}
+              {% else %}
+                Waiting for a reviewer
+              {% endif %}
+            </span>
+            <a class="btn btn-secondary btn-sm" href="{% url 'enrollment:application_detail' application.pk %}">
+              View application
+              <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg>
+            </a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="card">
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-file"></use></svg></span>
+        <h3>No application yet</h3>
+        <p>
+          {% if term and term.is_accepting_enrollment %}
+            Start your application for {{ term }}. It only takes a few minutes.
+          {% else %}
+            There is no open enrollment period right now. Check back when the next term opens.
+          {% endif %}
+        </p>
+        {% if term and term.is_accepting_enrollment %}
+          <a class="btn btn-primary" href="{% url 'enrollment:apply' %}">
+            <svg class="icon"><use href="#i-plus"></use></svg> Start application
+          </a>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 72" role="img" aria-label="Cavite State University seal">
+  <path d="M32 2 60 10v24c0 18-12 30-28 36C16 64 4 52 4 34V10z" fill="#0b5d3b" stroke="#f2c94c" stroke-width="3"/>
+  <path d="M32 7.5 55 14v20c0 15-10 25.5-23 31C19 59.5 9 49 9 34V14z" fill="none" stroke="#f2c94c" stroke-width="1.1" opacity=".55"/>
+  <path d="M32 16c3.4 4.6 5.6 7.4 5.6 11a5.6 5.6 0 0 1-11.2 0c0-3.6 2.2-6.4 5.6-11z" fill="#f2c94c"/>
+  <path d="M32 28v9" stroke="#f2c94c" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M25.5 39h13l-2 4h-9z" fill="#f2c94c"/>
+  <path d="M15.5 46c6-2.6 11-2.6 16.5 0 5.5-2.6 10.5-2.6 16.5 0v9c-6-2.6-11-2.6-16.5 0-5.5-2.6-10.5-2.6-16.5 0z" fill="#ffffff"/>
+  <path d="M32 46v9" stroke="#0b5d3b" stroke-width="1.6"/>
+  <path d="M13 41c-2.2-4.4-2-8.6.4-12.4 3.4 3.2 4.2 7.2 2 11.6z" fill="#f2c94c"/>
+  <path d="M51 41c2.2-4.4 2-8.6-.4-12.4-3.4 3.2-4.2 7.2-2 11.6z" fill="#f2c94c"/>
+</svg>

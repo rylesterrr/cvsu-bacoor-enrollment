@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar dashboard{% endblock %}
+{% block page_title %}Registrar dashboard{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Applications and enrollments at a glance{% if term %} · {{ term }}{% endif %}.</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  <a class="btn btn-primary" href="{% url 'enrollment:manage_applications' %}">
+    <svg class="icon"><use href="#i-clipboard"></use></svg> Review applications
+  </a>
+{% endblock %}
+
+{% block content %}
+  <div class="stat-grid">
+    <article class="stat-card">
+      <span class="stat-icon is-warning"><svg class="icon"><use href="#i-clock"></use></svg></span>
+      <div>
+        <p class="stat-label">Pending applications</p>
+        <p class="stat-value">{{ counts.pending_applications }}</p>
+        <p class="stat-note">Waiting for a first review</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-primary"><svg class="icon"><use href="#i-check-circle"></use></svg></span>
+      <div>
+        <p class="stat-label">Approved applications</p>
+        <p class="stat-value">{{ counts.approved_applications }}</p>
+        <p class="stat-note">{{ counts.under_review }} under review</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-danger"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+      <div>
+        <p class="stat-label">Pending enrollments</p>
+        <p class="stat-value">{{ counts.pending_enrollments }}</p>
+        <p class="stat-note">Need confirmation</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-success"><svg class="icon"><use href="#i-users"></use></svg></span>
+      <div>
+        <p class="stat-label">Enrolled students</p>
+        <p class="stat-value">{{ counts.enrolled_students }}</p>
+        <p class="stat-note">Confirmed for a term</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Recent applications</h2>
+          <p class="card-sub">Newest submissions first.</p>
+        </div>
+        <a class="text-link" href="{% url 'enrollment:manage_applications' %}">
+          View all <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg>
+        </a>
+      </div>
+
+      {% if recent_applications %}
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Program</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for application in recent_applications %}
+                <tr>
+                  <td>
+                    <span class="cell-title">{{ application.student.user.full_name }}</span>
+                    <span class="cell-sub">{{ application.student.student_number }} · {{ application.submitted_at|date:"M d" }}</span>
+                  </td>
+                  <td>
+                    <span class="cell-strong">{{ application.program.code }}</span>
+                    <span class="cell-sub">{{ application.get_year_level_display }}</span>
+                  </td>
+                  <td><span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span></td>
+                  <td class="num">
+                    <a class="btn btn-secondary btn-sm" href="{% url 'enrollment:review_application' application.pk %}">Review</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty">
+          <span class="empty-icon"><svg class="icon"><use href="#i-file"></use></svg></span>
+          <h3>No applications yet</h3>
+          <p>Student applications will appear here as soon as they are submitted.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <aside class="stack">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Active term</h2>
+            <p class="card-sub">{% if term %}Currently advertised to students.{% else %}No term is active.{% endif %}</p>
+          </div>
+        </div>
+        {% if term %}
+          <dl class="meta-list">
+            <div><dt>Term</dt><dd>{{ term }}</dd></div>
+            <div><dt>Enrollment</dt><dd>{% if term.is_accepting_enrollment %}<span class="badge badge-approved">Open</span>{% else %}<span class="badge badge-dropped">Closed</span>{% endif %}</dd></div>
+            <div><dt>Deadline</dt><dd>{{ term.enrollment_deadline|date:"M d, Y"|default:"Not set" }}</dd></div>
+            <div><dt>Classes start</dt><dd>{{ term.classes_start|date:"M d, Y"|default:"Not set" }}</dd></div>
+          </dl>
+          <a class="btn btn-secondary btn-block" href="{% url 'admin:enrollment_term_changelist' %}">Manage terms</a>
+        {% else %}
+          <p class="muted-text">Create a term and mark it active to open enrollment.</p>
+          <a class="btn btn-primary btn-block" href="{% url 'admin:enrollment_term_add' %}">Create a term</a>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Quick actions</h2>
+          </div>
+        </div>
+        <div class="quick-links">
+          <a href="{% url 'enrollment:manage_enrollments' %}">
+            <span class="quick-icon"><svg class="icon"><use href="#i-users"></use></svg></span>
+            <span><strong>Confirm enrollments</strong><small>{{ counts.pending_enrollments }} waiting</small></span>
+            <svg class="icon icon-sm"><use href="#i-chevron-right"></use></svg>
+          </a>
+          <a href="{% url 'enrollment:subjects' %}">
+            <span class="quick-icon"><svg class="icon"><use href="#i-book"></use></svg></span>
+            <span><strong>Subject offerings</strong><small>Schedules and seats</small></span>
+            <svg class="icon icon-sm"><use href="#i-chevron-right"></use></svg>
+          </a>
+          <a href="{% url 'admin:index' %}">
+            <span class="quick-icon"><svg class="icon"><use href="#i-shield"></use></svg></span>
+            <span><strong>Django admin</strong><small>Programs, terms, sections</small></span>
+            <svg class="icon icon-sm"><use href="#i-chevron-right"></use></svg>
+          </a>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Recent enrollments</h2>
+        <p class="card-sub">Latest student submissions and their confirmation status.</p>
+      </div>
+      <a class="text-link" href="{% url 'enrollment:manage_enrollments' %}">
+        View all <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg>
+      </a>
+    </div>
+
+    {% if recent_enrollments %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Student</th>
+              <th>Term</th>
+              <th>Submitted</th>
+              <th class="num">Units</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enrollment in recent_enrollments %}
+              <tr>
+                <td><span class="cell-strong">{{ enrollment.reference_code }}</span></td>
+                <td>
+                  <span class="cell-title">{{ enrollment.student.user.full_name }}</span>
+                  <span class="cell-sub">{{ enrollment.student.student_number }}</span>
+                </td>
+                <td>{{ enrollment.term }}</td>
+                <td>{{ enrollment.submitted_at|date:"M d, Y" }}</td>
+                <td class="num">{{ enrollment.units_total|default:0 }}</td>
+                <td><span class="badge badge-{{ enrollment.status_slug }}">{{ enrollment.get_status_display }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+        <h3>No enrollments yet</h3>
+        <p>Approved students will appear here after they submit their sections.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

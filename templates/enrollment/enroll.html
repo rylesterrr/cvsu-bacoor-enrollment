@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Enroll{% endblock %}
+{% block page_title %}Online enrollment{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">{% if term %}{{ term }} · Choose up to {{ max_units }} units.{% else %}No active term.{% endif %}</p>
+{% endblock %}
+
+{% block content %}
+  {% if blocked_reason %}
+    <section class="card">
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-alert"></use></svg></span>
+        <h3>Enrollment is not available yet</h3>
+        <p>{{ blocked_reason }}</p>
+        <div class="empty-actions">
+          {% if application and not application.is_approved %}
+            <a class="btn btn-primary" href="{% url 'enrollment:application_detail' application.pk %}">View application</a>
+          {% elif not application and term %}
+            <a class="btn btn-primary" href="{% url 'enrollment:apply' %}">Start application</a>
+          {% endif %}
+          <a class="btn btn-secondary" href="{% url 'enrollment:dashboard' %}">Back to dashboard</a>
+        </div>
+      </div>
+    </section>
+  {% else %}
+    <form method="post" id="enrollForm" novalidate>
+      {% csrf_token %}
+      <div class="split split-wide">
+        <div class="stack">
+          {% if errors %}
+            <div class="form-alert">
+              <svg class="icon"><use href="#i-alert"></use></svg>
+              <div>
+                {% for error in errors %}<p>{{ error }}</p>{% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Available sections</h2>
+                <p class="card-sub">Select the sections you want for {{ term }}. Seats update in real time.</p>
+              </div>
+              <span class="badge badge-neutral">{{ sections|length }} offering{{ sections|length|pluralize }}</span>
+            </div>
+
+            <div class="section-list">
+              {% for section in sections %}
+                <label class="section-option {% if section.taken >= section.capacity %}is-full{% endif %}">
+                  <input
+                    type="checkbox"
+                    name="sections"
+                    value="{{ section.pk }}"
+                    data-units="{{ section.subject.units }}"
+                    {% if section.pk|stringformat:"s" in selected_ids %}checked{% endif %}
+                    {% if section.taken >= section.capacity %}disabled{% endif %}
+                  >
+                  <span class="section-check" aria-hidden="true">
+                    <svg class="icon icon-sm"><use href="#i-check"></use></svg>
+                  </span>
+                  <span class="section-body">
+                    <span class="section-top">
+                      <strong>{{ section.subject.code }}</strong>
+                      <span>{{ section.subject.title }}</span>
+                      <span class="units-pill">{{ section.subject.units }} units</span>
+                    </span>
+                    <span class="section-meta">
+                      Section {{ section.code }}
+                      <span class="dot-sep">·</span> {{ section.schedule }}
+                      {% if section.room %}<span class="dot-sep">·</span> {{ section.room }}{% endif %}
+                      {% if section.instructor %}<span class="dot-sep">·</span> {{ section.instructor }}{% endif %}
+                    </span>
+                  </span>
+                  <span class="section-slots {% if section.taken >= section.capacity %}is-full{% endif %}">
+                    {% if section.taken >= section.capacity %}
+                      Full
+                    {% else %}
+                      {{ section.taken }}/{{ section.capacity }} seats
+                    {% endif %}
+                  </span>
+                </label>
+              {% empty %}
+                <div class="empty">
+                  <span class="empty-icon"><svg class="icon"><use href="#i-book"></use></svg></span>
+                  <h3>No sections published</h3>
+                  <p>The registrar has not published sections for this term yet.</p>
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+
+        <aside class="stack sticky">
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Enrollment summary</h2>
+                <p class="card-sub">{{ term }}</p>
+              </div>
+            </div>
+            <div class="summary-row">
+              <span>Selected units</span>
+              <strong><span id="unitTotal">0</span> / {{ max_units }}</strong>
+            </div>
+            <div class="summary-row">
+              <span>Selected subjects</span>
+              <strong id="subjectTotal">0</strong>
+            </div>
+            <p class="field-help">Your enrollment is submitted as <strong>Pending confirmation</strong> until the registrar reviews it.</p>
+            <button type="submit" class="btn btn-primary btn-block" {% if not sections %}disabled{% endif %}>
+              Submit enrollment
+              <svg class="icon"><use href="#i-arrow-right"></use></svg>
+            </button>
+            <a class="btn btn-ghost btn-block" href="{% url 'enrollment:subjects' %}">View subject offerings</a>
+          </section>
+
+          <section class="card card-muted">
+            <div class="card-head">
+              <div>
+                <h2>Approved application</h2>
+              </div>
+              <span class="badge badge-approved">Approved</span>
+            </div>
+            <dl class="meta-list">
+              <div><dt>Program</dt><dd>{{ application.program }}</dd></div>
+              <div><dt>Year level</dt><dd>{{ application.get_year_level_display }}</dd></div>
+              <div><dt>Student number</dt><dd>{{ profile.student_number }}</dd></div>
+            </dl>
+          </section>
+        </aside>
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Subject offerings{% endblock %}
+{% block page_title %}Subject offerings{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">{% if term %}Sections published for {{ term }}.{% else %}No active term yet.{% endif %}</p>
+{% endblock %}
+
+{% block content %}
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Published sections</h2>
+        <p class="card-sub">Seat counts include pending and confirmed enrollments.</p>
+      </div>
+      {% if term %}
+        <span class="badge {% if term.is_accepting_enrollment %}badge-approved{% else %}badge-dropped{% endif %}">
+          {% if term.is_accepting_enrollment %}Enrollment open{% else %}Enrollment closed{% endif %}
+        </span>
+      {% endif %}
+    </div>
+
+    {% if sections %}
+      <div class="table-wrap">
+        <table class="data-table table-compact">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Program</th>
+              <th>Section</th>
+              <th>Schedule</th>
+              <th>Room</th>
+              <th>Instructor</th>
+              <th class="num">Units</th>
+              <th class="num">Seats</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for section in sections %}
+              <tr>
+                <td>
+                  <span class="cell-title">{{ section.subject.code }}</span>
+                  <span class="cell-sub">{{ section.subject.title }}</span>
+                </td>
+                <td>{{ section.subject.program.code|default:"General" }}</td>
+                <td>{{ section.code }}</td>
+                <td class="nowrap">{{ section.schedule }}</td>
+                <td class="nowrap">{{ section.room|default:"TBA" }}</td>
+                <td class="nowrap">{{ section.instructor|default:"TBA" }}</td>
+                <td class="num">{{ section.subject.units }}</td>
+                <td class="num">
+                  {% if section.taken >= section.capacity %}
+                    <span class="badge badge-dropped">Full</span>
+                  {% else %}
+                    <span class="cell-strong">{{ section.slots_left }}</span>
+                    <span class="cell-sub">of {{ section.capacity }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-book"></use></svg></span>
+        <h3>No sections published</h3>
+        <p>Check back once the registrar publishes the schedule for the term.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

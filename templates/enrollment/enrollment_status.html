@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Enrollment status{% endblock %}
+{% block page_title %}Enrollment status{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Your subjects, units, and confirmation status for the term.</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  {% if term and term.is_accepting_enrollment and not current %}
+    <a class="btn btn-primary" href="{% url 'enrollment:enroll' %}">Enroll now</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if current %}
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <span class="eyebrow">{{ current.reference_code }}</span>
+          <h2>{{ current.term }}</h2>
+          <p class="card-sub">Submitted {{ current.submitted_at|date:"M d, Y g:i A" }}</p>
+        </div>
+        <span class="badge badge-{{ current.status_slug }}">{{ current.get_status_display }}</span>
+      </div>
+
+      <div class="notice notice-{{ current.status_slug }}">
+        <svg class="icon"><use href="#i-info"></use></svg>
+        <p>{{ current.status_note }}</p>
+      </div>
+
+      <div class="stat-grid stat-grid-inline">
+        <div class="mini-stat">
+          <span class="detail-label">Total units</span>
+          <strong>{{ current.total_units }}</strong>
+        </div>
+        <div class="mini-stat">
+          <span class="detail-label">Subjects</span>
+          <strong>{{ current.subject_count }}</strong>
+        </div>
+        <div class="mini-stat">
+          <span class="detail-label">Term</span>
+          <strong>{{ current.term.get_semester_display }}</strong>
+        </div>
+        <div class="mini-stat">
+          <span class="detail-label">School year</span>
+          <strong>{{ current.term.school_year }}</strong>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Section</th>
+              <th>Schedule</th>
+              <th>Room</th>
+              <th class="num">Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in current.subjects.all %}
+              <tr>
+                <td>
+                  <span class="cell-title">{{ item.section.subject.code }}</span>
+                  <span class="cell-sub">{{ item.section.subject.title }}</span>
+                </td>
+                <td>{{ item.section.code }}</td>
+                <td>{{ item.section.schedule }}</td>
+                <td>{{ item.section.room|default:"TBA" }}</td>
+                <td class="num">{{ item.section.subject.units }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="table-empty">No subjects on this enrollment.</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="4">Total units</th>
+              <th class="num">{{ current.total_units }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  {% else %}
+    <section class="card">
+      <div class="empty">
+        <span class="empty-icon"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+        <h3>No enrollment yet</h3>
+        <p>
+          Once your application is approved, choose your sections and submit an enrollment.
+          Your confirmation status will appear here.
+        </p>
+        {% if term and term.is_accepting_enrollment %}
+          <a class="btn btn-primary" href="{% url 'enrollment:enroll' %}">Go to enrollment</a>
+        {% else %}
+          <a class="btn btn-secondary" href="{% url 'enrollment:subjects' %}">Browse subject offerings</a>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if enrollments|length > 1 %}
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>Enrollment history</h2>
+          <p class="card-sub">All enrollment records linked to your student number.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Term</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th class="num">Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enrollment in enrollments %}
+              <tr>
+                <td><span class="cell-strong">{{ enrollment.reference_code }}</span></td>
+                <td>{{ enrollment.term }}</td>
+                <td>{{ enrollment.submitted_at|date:"M d, Y" }}</td>
+                <td><span class="badge badge-{{ enrollment.status_slug }}">{{ enrollment.get_status_display }}</span></td>
+                <td class="num">{{ enrollment.total_units }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

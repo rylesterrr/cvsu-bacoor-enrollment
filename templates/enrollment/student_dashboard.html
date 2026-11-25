@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}
+  <p class="page-subtitle">Welcome back, {{ user.full_name }}. Here is where you stand{% if term %} for {{ term }}{% endif %}.</p>
+{% endblock %}
+
+{% block topbar_actions %}
+  {% if term and term.is_accepting_enrollment %}
+    {% if not application %}
+      <a class="btn btn-primary" href="{% url 'enrollment:apply' %}">
+        <svg class="icon"><use href="#i-plus"></use></svg> Apply now
+      </a>
+    {% elif application.is_approved and not enrollment %}
+      <a class="btn btn-primary" href="{% url 'enrollment:enroll' %}">
+        <svg class="icon"><use href="#i-check"></use></svg> Enroll now
+      </a>
+    {% elif enrollment %}
+      <a class="btn btn-secondary" href="{% url 'enrollment:enrollment_status' %}">
+        View enrollment
+      </a>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow eyebrow-light">
+        <svg class="icon"><use href="#i-calendar"></use></svg>
+        {% if term %}{{ term }}{% else %}No active term{% endif %}
+      </span>
+      <h2>{% if enrollment %}You are set for this term.{% elif application.is_approved %}One step left: choose your sections.{% elif application %}Your application is in the works.{% else %}Ready to start your semester?{% endif %}</h2>
+      <p>
+        {% if enrollment %}
+          Your enrollment is {{ enrollment.get_status_display|lower }}. Keep your reference code handy.
+        {% elif application.is_approved %}
+          Your application was approved. Pick your sections before the enrollment deadline.
+        {% elif application %}
+          Track your application status here. We will update it as soon as the registrar reviews it.
+        {% else %}
+          Submit your application online, then enroll in sections once you are approved.
+        {% endif %}
+      </p>
+      <div class="hero-actions">
+        {% if not application and term and term.is_accepting_enrollment %}
+          <a class="btn btn-light" href="{% url 'enrollment:apply' %}">Start application <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+        {% elif application.is_approved and not enrollment and term and term.is_accepting_enrollment %}
+          <a class="btn btn-light" href="{% url 'enrollment:enroll' %}">Choose sections <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+        {% elif enrollment %}
+          <a class="btn btn-light" href="{% url 'enrollment:enrollment_status' %}">View enrollment <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+        {% else %}
+          <a class="btn btn-light" href="{% url 'enrollment:subjects' %}">Browse subject offerings</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="hero-side">
+      <div class="hero-status">
+        <span>Application</span>
+        {% if application %}
+          <strong>{{ application.get_status_display }}</strong>
+          <span class="hero-status-note">{{ application.program.code }}</span>
+        {% else %}
+          <strong>Not started</strong>
+          <span class="hero-status-note">Apply to begin</span>
+        {% endif %}
+      </div>
+      <div class="hero-status">
+        <span>Enrollment</span>
+        {% if enrollment %}
+          <strong>{{ enrollment.get_status_display }}</strong>
+          <span class="hero-status-note">{{ enrollment.reference_code }}</span>
+        {% else %}
+          <strong>Not enrolled</strong>
+          <span class="hero-status-note">Available after approval</span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <div class="stat-grid">
+    <article class="stat-card">
+      <span class="stat-icon is-primary"><svg class="icon"><use href="#i-file"></use></svg></span>
+      <div>
+        <p class="stat-label">Application status</p>
+        {% if application %}
+          <p class="stat-value stat-value-sm"><span class="badge badge-{{ application.status_slug }}">{{ application.get_status_display }}</span></p>
+          <p class="stat-note">Submitted {{ application.submitted_at|date:"M d, Y" }}</p>
+        {% else %}
+          <p class="stat-value stat-value-sm"><span class="badge badge-neutral">Not started</span></p>
+          <p class="stat-note">No application for this term</p>
+        {% endif %}
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-warning"><svg class="icon"><use href="#i-clipboard"></use></svg></span>
+      <div>
+        <p class="stat-label">Enrollment status</p>
+        {% if enrollment %}
+          <p class="stat-value stat-value-sm"><span class="badge badge-{{ enrollment.status_slug }}">{{ enrollment.get_status_display }}</span></p>
+          <p class="stat-note">{{ enrollment.reference_code }}</p>
+        {% else %}
+          <p class="stat-value stat-value-sm"><span class="badge badge-neutral">Not enrolled</span></p>
+          <p class="stat-note">Enrollment opens after approval</p>
+        {% endif %}
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-success"><svg class="icon"><use href="#i-book"></use></svg></span>
+      <div>
+        <p class="stat-label">Units this term</p>
+        <p class="stat-value">{% if enrollment %}{{ enrollment.total_units }}{% else %}0{% endif %}<span class="stat-unit">/ {{ max_units }}</span></p>
+        <p class="stat-note">{% if enrollment %}{{ enrollment.subject_count }} subject{{ enrollment.subject_count|pluralize }}{% else %}No subjects selected{% endif %}</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <span class="stat-icon is-danger"><svg class="icon"><use href="#i-school"></use></svg></span>
+      <div>
+        <p class="stat-label">Section offerings</p>
+        <p class="stat-value">{{ available_sections }}</p>
+        <p class="stat-note">Available for {{ term|default:"the next term" }}</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>{% if enrollment %}Your subjects{% else %}Your next steps{% endif %}</h2>
+          <p class="card-sub">
+            {% if enrollment %}
+              Section assignments for {{ enrollment.term }}.
+            {% else %}
+              Complete these steps to finish enrollment.
+            {% endif %}
+          </p>
+        </div>
+        {% if enrollment %}
+          <a class="text-link" href="{% url 'enrollment:enrollment_status' %}">Details <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+        {% endif %}
+      </div>
+
+      {% if enrollment %}
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Section</th>
+                <th>Schedule</th>
+                <th class="num">Units</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in enrollment.subjects.all %}
+                <tr>
+                  <td>
+                    <span class="cell-title">{{ item.section.subject.code }}</span>
+                    <span class="cell-sub">{{ item.section.subject.title }}</span>
+                  </td>
+                  <td>{{ item.section.code }}</td>
+                  <td>
+                    <span class="cell-strong">{{ item.section.schedule }}</span>
+                    <span class="cell-sub">{{ item.section.room|default:"Room TBA" }}</span>
+                  </td>
+                  <td class="num">{{ item.section.subject.units }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="table-empty">No subjects were added to this enrollment.</td></tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th colspan="3">Total units</th>
+                <th class="num">{{ enrollment.total_units }}</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      {% else %}
+        <ol class="steps">
+          <li class="step {% if application %}is-done{% else %}is-current{% endif %}">
+            <span class="step-marker">{% if application %}<svg class="icon icon-sm"><use href="#i-check"></use></svg>{% else %}1{% endif %}</span>
+            <div>
+              <strong>Submit your application</strong>
+              <p>Choose a program and tell us about your academic background.</p>
+              {% if not application and term and term.is_accepting_enrollment %}
+                <a class="text-link" href="{% url 'enrollment:apply' %}">Start application <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+              {% endif %}
+            </div>
+          </li>
+          <li class="step {% if application.is_approved %}is-done{% elif application %}is-current{% endif %}">
+            <span class="step-marker">{% if application.is_approved %}<svg class="icon icon-sm"><use href="#i-check"></use></svg>{% else %}2{% endif %}</span>
+            <div>
+              <strong>Wait for approval</strong>
+              <p>The registrar reviews your application and posts a decision.</p>
+            </div>
+          </li>
+          <li class="step {% if enrollment %}is-done{% elif application.is_approved %}is-current{% endif %}">
+            <span class="step-marker">{% if enrollment %}<svg class="icon icon-sm"><use href="#i-check"></use></svg>{% else %}3{% endif %}</span>
+            <div>
+              <strong>Choose your sections</strong>
+              <p>Select up to {{ max_units }} units for the term.</p>
+              {% if application.is_approved and not enrollment and term and term.is_accepting_enrollment %}
+                <a class="text-link" href="{% url 'enrollment:enroll' %}">Enroll now <svg class="icon icon-sm"><use href="#i-arrow-right"></use></svg></a>
+              {% endif %}
+            </div>
+          </li>
+          <li class="step {% if enrollment.status == 'ENROLLED' %}is-done{% elif enrollment %}is-current{% endif %}">
+            <span class="step-marker">{% if enrollment.status == 'ENROLLED' %}<svg class="icon icon-sm"><use href="#i-check"></use></svg>{% else %}4{% endif %}</span>
+            <div>
+              <strong>Get confirmed</strong>
+              <p>The registrar confirms your enrollment and you are officially enrolled.</p>
+            </div>
+          </li>
+        </ol>
+      {% endif %}
+    </section>
+
+    <aside class="stack">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Term details</h2>
+            <p class="card-sub">Important dates for your enrollment.</p>
+          </div>
+        </div>
+        {% if term %}
+          <dl class="meta-list">
+            <div><dt>School year</dt><dd>{{ term.school_year }}</dd></div>
+            <div><dt>Semester</dt><dd>{{ term.get_semester_display }}</dd></div>
+            <div><dt>Enrollment deadline</dt><dd>{{ term.enrollment_deadline|date:"M d, Y"|default:"Not set" }}</dd></div>
+            <div><dt>Classes start</dt><dd>{{ term.classes_start|date:"M d, Y"|default:"Not set" }}</dd></div>
+            <div>
+              <dt>Enrollment</dt>
+              <dd>
+                {% if term.is_accepting_enrollment %}
+                  <span class="badge badge-approved">Open</span>
+                {% else %}
+                  <span class="badge badge-dropped">Closed</span>
+                {% endif %}
+              </dd>
+            </div>
+          </dl>
+        {% else %}
+          <p class="muted-text">The registrar has not opened a term yet.</p>
+        {% endif %}
+      </section>
+
+      <section class="card card-muted">
+        <div class="card-head">
+          <div>
+            <h2>Need help?</h2>
+            <p class="card-sub">Reach the registrar's office.</p>
+          </div>
+        </div>
+        <p class="muted-text">For corrections to your records or enrollment concerns, email <strong>registrar@example.edu</strong> and include your student number.</p>
+        <p class="cell-sub">Student number: {{ profile.student_number|default:"Not assigned" }}</p>
+      </section>
+    </aside>
+  </div>
+{% endblock %}
